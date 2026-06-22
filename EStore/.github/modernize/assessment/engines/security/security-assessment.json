@@ -1,0 +1,97 @@
+{
+  "GeneratedAt": "2026-06-22T10:05:40.0000000Z",
+  "ProjectPath": ".",
+  "Summary": {
+    "TotalFindings": 6,
+    "CveCount": 1,
+    "CweCount": 5,
+    "BySeverity": {
+      "optional": 2,
+      "mandatory": 1,
+      "potential": 3
+    },
+    "ByCategory": {
+      "Credentials & Secrets": 3,
+      "CVE": 1,
+      "Code Quality": 2
+    },
+    "TotalRulesAssessed": 59,
+    "RulesPassed": 54
+  },
+  "CveFindings": {
+    "Id": "CVE-2021-21252",
+    "Name": "Regular Expression Denial of Service in jquery-validation",
+    "Category": "CVE",
+    "Severity": "mandatory",
+    "StoryPoint": 1,
+    "Description": "[CVE-2021-21252](https://github.com/advisories/GHSA-jxwx-85vp-gvwm): Regular Expression Denial of Service in jquery-validation\n\nSeverity: HIGH\n\nAffected dependencies:\n  - jQuery.Validation:1.13.1 (declared at EStore.WebUI/packages.config:7)\n\nRecommended fix:\n  - Upgrade jQuery.Validation to 1.19.3 or later",
+    "Files": [
+      "EStore.WebUI/packages.config:7"
+    ],
+    "Explanation": "[CVE-2021-21252](https://github.com/advisories/GHSA-jxwx-85vp-gvwm): Regular Expression Denial of Service in jquery-validation\n\nSeverity: HIGH\n\nAffected dependencies:\n  - jQuery.Validation:1.13.1 (declared at EStore.WebUI/packages.config:7)\n\nRecommended fix:\n  - Upgrade jQuery.Validation to 1.19.3 or later"
+  },
+  "CweFindings": [
+    {
+      "Id": "CWE-772",
+      "Name": "Missing Release of Resource after Effective Lifetime",
+      "Category": "Code Quality",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "The product does not release a resource after its effective lifetime has ended, i.e., after the resource is no longer needed.",
+      "Files": [
+        "EStore.Domain/Concrete/EFProductRepository.cs"
+      ],
+      "Explanation": "In EFProductRepository (line 13), an EFDbContext instance is created as a class field but EFProductRepository does not implement IDisposable and never calls context.Dispose(). EFDbContext extends DbContext which implements IDisposable, so the underlying database connection and resources are never explicitly released."
+    },
+    {
+      "Id": "CWE-775",
+      "Name": "Missing Release of File Descriptor or Handle after Effective Lifetime",
+      "Category": "Code Quality",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "The product does not release a file descriptor or handle after its effective lifetime has ended, i.e., after the file descriptor/handle is no longer needed.",
+      "Files": [
+        "EStore.Domain/Concrete/EmailOrderProcessor.cs"
+      ],
+      "Explanation": "In EmailOrderProcessor.ProcessOrder (line 73), a MailMessage instance is created but never disposed. MailMessage implements IDisposable and holds internal stream handles. The MailMessage is used inside a using(smtpClient) block but is not itself wrapped in a using statement or explicitly disposed before the method returns."
+    },
+    {
+      "Id": "CWE-259",
+      "Name": "Use of Hard-coded Password",
+      "Category": "Credentials & Secrets",
+      "Severity": "optional",
+      "StoryPoint": 5,
+      "Description": "The product contains a hard-coded password, which it uses for its own inbound authentication or for outbound communication to external components.",
+      "Files": [
+        "EStore.WebUI/Web.config:29",
+        "EStore.Domain/Concrete/EmailOrderProcessor.cs:91"
+      ],
+      "Explanation": "Two hard-coded passwords found: (1) Web.config line 29 contains a plaintext admin password in the Forms Authentication credentials section: `<user name=\"admin\" ******/>` with `passwordFormat=\"Clear\"`. (2) EmailOrderProcessor.cs line 91 in the EmailSettings class defines `public string Password = \"MySmtpPassword\";` as a hard-coded SMTP password."
+    },
+    {
+      "Id": "CWE-778",
+      "Name": "Insufficient Logging",
+      "Category": "Credentials & Secrets",
+      "Severity": "potential",
+      "StoryPoint": 3,
+      "Description": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+      "Files": [
+        "EStore.WebUI/Controllers/AccountController.cs"
+      ],
+      "Explanation": "No logging framework (ILogger, NLog, log4net, Serilog, or System.Diagnostics) is present anywhere in the codebase. The AccountController.Login method handles authentication failures (line 40: ModelState.AddModelError on bad credentials) but does not log the failed attempt, the username, or the remote IP. Security-critical events such as failed logins, unauthorized access attempts, and admin operations are not recorded."
+    },
+    {
+      "Id": "CWE-798",
+      "Name": "Use of Hard-coded Credentials",
+      "Category": "Credentials & Secrets",
+      "Severity": "optional",
+      "StoryPoint": 5,
+      "Description": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+      "Files": [
+        "EStore.WebUI/Web.config:28",
+        "EStore.Domain/Concrete/EmailOrderProcessor.cs:88"
+      ],
+      "Explanation": "Hard-coded credentials found in two locations: (1) Web.config lines 28-30 contain hard-coded admin credentials (`name=\"admin\" ******`) stored in clear text (`passwordFormat=\"Clear\"`). (2) EmailOrderProcessor.cs EmailSettings class (lines 88-91) contains hard-coded SMTP credentials: `public string UserName = \"MySmtpUserName\"` and `public string Password = \"MySmtpPassword\"`."
+    }
+  ]
+}

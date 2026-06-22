@@ -1106,7 +1106,7 @@
     },
     "Database.0002": {
       "id": "Database.0002",
-      "description": "SQL database connection detected.\n\nEnsure the database is available/reachable on Azure.\n\nIf it is not, there are multiple ways you can move your data to Azure:\n    1. Migrate to Azure SQL Database.\n    2. Consider Azure SQL Managed Instance if you need features that are not available in Azure SQL Database and you don\u2019t want to use a VM.\n    3. Migrate your database servers directly to SQL Server on Azure VMs.\n\nTo assess database migration effort, you can use Azure Migrate tool, see the link below.",
+      "description": "SQL database connection detected.\n\nEnsure the database is available/reachable on Azure.\n\nIf it is not, there are multiple ways you can move your data to Azure:\n    1. Migrate to Azure SQL Database.\n    2. Consider Azure SQL Managed Instance if you need features that are not available in Azure SQL Database and you don’t want to use a VM.\n    3. Migrate your database servers directly to SQL Server on Azure VMs.\n\nTo assess database migration effort, you can use Azure Migrate tool, see the link below.",
       "title": "SQL database connection detected",
       "severity": "potential",
       "effort": 3,
@@ -1141,7 +1141,7 @@
     },
     "Identity.0002": {
       "id": "Identity.0002",
-      "description": "Your app is using windows authentication which is not supported on Azure App Service, Azure Container Apps and Azure Kubernetes Service.\n\nAzure App Service provides built-in authentication and authorization capabilities, so you can sign in users and access data by writing minimal or no code in your web app.\n\nFollow the link below for more information.\u0022",
+      "description": "Your app is using windows authentication which is not supported on Azure App Service, Azure Container Apps and Azure Kubernetes Service.\n\nAzure App Service provides built-in authentication and authorization capabilities, so you can sign in users and access data by writing minimal or no code in your web app.\n\nFollow the link below for more information.\"",
       "title": "Windows authentication detected",
       "severity": "mandatory",
       "effort": 3,
@@ -1174,5 +1174,93 @@
       ],
       "labels": []
     }
-  }
+  },
+  "security": [
+    {
+      "id": "CVE-2021-21252",
+      "title": "Regular Expression Denial of Service in jquery-validation",
+      "category": "CVE",
+      "severity": "mandatory",
+      "description": "[CVE-2021-21252](https://github.com/advisories/GHSA-jxwx-85vp-gvwm): Regular Expression Denial of Service in jquery-validation\n\nSeverity: HIGH\n\nAffected dependencies:\n  - jQuery.Validation:1.13.1 (declared at EStore.WebUI/packages.config:7)\n\nRecommended fix:\n  - Upgrade jQuery.Validation to 1.19.3 or later",
+      "evidence": {
+        "files": [
+          "EStore.WebUI/packages.config:7"
+        ],
+        "explanation": "[CVE-2021-21252](https://github.com/advisories/GHSA-jxwx-85vp-gvwm): Regular Expression Denial of Service in jquery-validation\n\nSeverity: HIGH\n\nAffected dependencies:\n  - jQuery.Validation:1.13.1 (declared at EStore.WebUI/packages.config:7)\n\nRecommended fix:\n  - Upgrade jQuery.Validation to 1.19.3 or later"
+      },
+      "storyPoint": 1
+    },
+    {
+      "id": "CWE-772",
+      "title": "Missing Release of Resource after Effective Lifetime",
+      "category": "Code Quality",
+      "severity": "potential",
+      "description": "The product does not release a resource after its effective lifetime has ended, i.e., after the resource is no longer needed.",
+      "evidence": {
+        "files": [
+          "EStore.Domain/Concrete/EFProductRepository.cs"
+        ],
+        "explanation": "In EFProductRepository (line 13), an EFDbContext instance is created as a class field but EFProductRepository does not implement IDisposable and never calls context.Dispose(). EFDbContext extends DbContext which implements IDisposable, so the underlying database connection and resources are never explicitly released."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-775",
+      "title": "Missing Release of File Descriptor or Handle after Effective Lifetime",
+      "category": "Code Quality",
+      "severity": "potential",
+      "description": "The product does not release a file descriptor or handle after its effective lifetime has ended, i.e., after the file descriptor/handle is no longer needed.",
+      "evidence": {
+        "files": [
+          "EStore.Domain/Concrete/EmailOrderProcessor.cs"
+        ],
+        "explanation": "In EmailOrderProcessor.ProcessOrder (line 73), a MailMessage instance is created but never disposed. MailMessage implements IDisposable and holds internal stream handles. The MailMessage is used inside a using(smtpClient) block but is not itself wrapped in a using statement or explicitly disposed before the method returns."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-259",
+      "title": "Use of Hard-coded Password",
+      "category": "Credentials & Secrets",
+      "severity": "optional",
+      "description": "The product contains a hard-coded password, which it uses for its own inbound authentication or for outbound communication to external components.",
+      "evidence": {
+        "files": [
+          "EStore.WebUI/Web.config:29",
+          "EStore.Domain/Concrete/EmailOrderProcessor.cs:91"
+        ],
+        "explanation": "Two hard-coded passwords found: (1) Web.config line 29 contains a plaintext admin password in the Forms Authentication credentials section: `<user name=\"admin\" ******/>` with `passwordFormat=\"Clear\"`. (2) EmailOrderProcessor.cs line 91 in the EmailSettings class defines `public string Password = \"MySmtpPassword\";` as a hard-coded SMTP password."
+      },
+      "storyPoint": 5
+    },
+    {
+      "id": "CWE-778",
+      "title": "Insufficient Logging",
+      "category": "Credentials & Secrets",
+      "severity": "potential",
+      "description": "When a security-critical event occurs, the product either does not record the event or omits important details about the event when logging it.",
+      "evidence": {
+        "files": [
+          "EStore.WebUI/Controllers/AccountController.cs"
+        ],
+        "explanation": "No logging framework (ILogger, NLog, log4net, Serilog, or System.Diagnostics) is present anywhere in the codebase. The AccountController.Login method handles authentication failures (line 40: ModelState.AddModelError on bad credentials) but does not log the failed attempt, the username, or the remote IP. Security-critical events such as failed logins, unauthorized access attempts, and admin operations are not recorded."
+      },
+      "storyPoint": 3
+    },
+    {
+      "id": "CWE-798",
+      "title": "Use of Hard-coded Credentials",
+      "category": "Credentials & Secrets",
+      "severity": "optional",
+      "description": "The product contains hard-coded credentials, such as a password or cryptographic key.",
+      "evidence": {
+        "files": [
+          "EStore.WebUI/Web.config:28",
+          "EStore.Domain/Concrete/EmailOrderProcessor.cs:88"
+        ],
+        "explanation": "Hard-coded credentials found in two locations: (1) Web.config lines 28-30 contain hard-coded admin credentials (`name=\"admin\" ******`) stored in clear text (`passwordFormat=\"Clear\"`). (2) EmailOrderProcessor.cs EmailSettings class (lines 88-91) contains hard-coded SMTP credentials: `public string UserName = \"MySmtpUserName\"` and `public string Password = \"MySmtpPassword\"`."
+      },
+      "storyPoint": 5
+    }
+  ]
 }
